@@ -2,6 +2,7 @@
 #include "Card.h"
 #include <vector>
 #include <cstdint>
+#include <string_view>
 
 class Player
 {
@@ -11,18 +12,19 @@ private:
     std::string m_name;
 
 public:
-    Player(int playerid, const std::string& playerm_name);
+    Player(int playerid, std::string playerm_name);
     void addCard(const Card& card);
+    void addCard(Card&& card);
     bool removeCard(const Card& card);
     Card* findCard(const Card& card);
-    std::uint8_t getId() const;
-    std::string getName() const;
-    const std::vector<Card>& getHand() const;
-    std::vector<Card>& getHandRef();
-    std::uint8_t getHandSize() const;
-    bool hasWon() const;
+    std::uint8_t getId() const noexcept;
+    const std::string& getName() const noexcept;
+    const std::vector<Card>& getHand() const noexcept;
+    std::vector<Card>& getHandRef() noexcept;
+    std::uint8_t getHandSize() const noexcept;
+    bool hasWon() const noexcept;
     void displayHand() const;
-    bool hasCardWithValue(const std::string& m_value) const;
-    std::vector<int> getIndicesOfValue(const std::string& m_value) const;
+    bool hasCardWithValue(std::string_view m_value) const;
+    std::vector<int> getIndicesOfValue(std::string_view m_value) const;
 };
 

@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstdint>
+#include <random>
 
 class Deck
 {
@@ -22,6 +23,7 @@ public:
     bool isEmpty() const;
     Card drawCard();
     void addCard(const Card& card);
-    std::uint8_t size() const;
+    void addCard(Card&& card);
+    std::uint8_t size() const noexcept;
     void shuffle();
 };

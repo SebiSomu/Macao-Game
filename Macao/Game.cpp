@@ -1,4 +1,7 @@
-﻿#include "Game.h"
+#include "Game.h"
+#include <random>
+#include <algorithm>
+#include <iterator>
 
 Game::Game()
     : m_human(0, "You"), 
@@ -21,8 +24,7 @@ void Game::dealInitialCards()
 
 void Game::startGame()
 {
-    Card firstCard = m_deck.drawCard();
-    m_discardPile.push(firstCard);
+    m_discardPile.push(m_deck.drawCard());
 }
 
 void Game::displayTopCard() const
@@ -59,18 +61,17 @@ void Game::reshuffleDeck()
 
     std::cout << "Deck is empty, reshuffling discard pile...\n";
 
-    Card lastCard = m_discardPile.top();
+    Card lastCard = std::move(m_discardPile.top());
     m_discardPile.pop();
 
     while (!m_discardPile.empty())
     {
-        Card c = m_discardPile.top();
+        m_deck.addCard(std::move(m_discardPile.top()));
         m_discardPile.pop();
-        m_deck.addCard(c);
     }
 
     m_deck.shuffle();
-    m_discardPile.push(lastCard);
+    m_discardPile.push(std::move(lastCard));
 }
 
 Card Game::drawCardFromDeck(Player& player)
@@ -97,7 +98,7 @@ bool Game::playCard(Player& player, Card& card)
         card.setSuit(newSuit);
     }
 
-    m_discardPile.push(card);
+    m_discardPile.push(card); // card is passed by reference, we copy into pile then remove from player
     player.removeCard(card);
 
     return true;
@@ -191,11 +192,13 @@ char Game::aiChooseSuit()
             bestSuit = suit;
         }
     
-
     if (maxCount <= 0 || (bestSuit != 'T' && bestSuit != 'R' && bestSuit != 'N' && bestSuit != 'C'))
     {
-        char suits[] = { 'T', 'R', 'N', 'C' };
-        bestSuit = suits[rand() % 4];
+        const char suits[] = { 'T', 'R', 'N', 'C' };
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::uniform_int_distribution<size_t> dist(0, 3);
+        bestSuit = suits[dist(g)];
     }
 
     return bestSuit;
@@ -234,8 +237,11 @@ char Game::getMostFrequentSuit(const std::vector<Card>& excludeCards) const
 
     if (maxCount <= 0)
     {
-        char suits[] = { 'T', 'R', 'N', 'C' };
-        bestSuit = suits[rand() % 4];
+        const char suits[] = { 'T', 'R', 'N', 'C' };
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::uniform_int_distribution<size_t> dist(0, 3);
+        bestSuit = suits[dist(g)];
     }
 
     return bestSuit;
@@ -335,8 +341,10 @@ std::vector<Card> Game::aiSelectCards()
 
         if (isInflate && cards.size() > 1)
         {
-            int aggressiveChance = rand() % 100;
-            if (aggressiveChance >= 10)
+            std::random_device rd;
+            std::mt19937 g(rd());
+            std::uniform_int_distribution<int> dist(0, 99);
+            if (dist(g) >= 10)
             {
                 std::vector<Card> single = { cards[0] };
                 int score = 1;
@@ -441,12 +449,12 @@ void Game::aiTurn()
 
             if (foundCard->getValue() == "7")
             {
-                Card copy = *foundCard;
+                Card cardToPlay = *foundCard;
                 char newSuit = aiChooseSuit();
-                copy.setSuit(newSuit);
+                cardToPlay.setSuit(newSuit);
                 std::cout << "AI played 7 and chose suit: " << newSuit << "\n";
 
-                m_discardPile.push(copy);
+                m_discardPile.push(std::move(cardToPlay));
                 m_ai.removeCard(*foundCard);
                 continue;
             }

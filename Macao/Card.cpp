@@ -1,33 +1,33 @@
-﻿#include "Card.h"
+#include "Card.h"
 
 Card::Card() : m_value(""), m_suit('?'), m_joker(false) {}
 
-Card::Card(const std::string& m_cardstring) : m_value(""), m_suit('?'), m_joker(false)
+Card::Card(std::string_view m_cardstring) : m_value(""), m_suit('?'), m_joker(false)
 {
     parseCardstring(m_cardstring);
 }
 
-bool Card::isJoker() const
+bool Card::isJoker() const noexcept
 {
     return m_joker; 
 }
 
-const std::string& Card::getValue() const
+const std::string& Card::getValue() const noexcept
 {
     return m_value;
 }
 
-char Card::getSuit() const
+char Card::getSuit() const noexcept
 {
     return m_suit;
 }
 
-void Card::setSuit(char s)
+void Card::setSuit(char s) noexcept
 {
     m_suit = s;
 }
 
-void Card::parseCardstring(const std::string& s)
+void Card::parseCardstring(std::string_view s)
 {
     if (s == "Joker")
     {
@@ -37,13 +37,13 @@ void Card::parseCardstring(const std::string& s)
     }
     else if (s.size() == 3)
     {
-        m_value = s.substr(0, 2);
+        m_value = std::string(s.substr(0, 2));
         m_suit = s[2];
         m_joker = false;
     }
     else if (s.size() >= 2)
     {
-        m_value = s.substr(0, 1);
+        m_value = std::string(s.substr(0, 1));
         m_suit = s[1];
         m_joker = false;
     }
@@ -64,7 +64,7 @@ bool Card::isValidCard(const Card& topCard, int cardsToDraw) const
 }
 
 
-bool Card::operator==(const Card& other) const
+bool Card::operator==(const Card& other) const noexcept
 {
     return m_value == other.m_value && m_suit == other.m_suit;
 }

@@ -1,23 +1,60 @@
-# Ignore executables
-*.exe
-*.out
-*.obj
-*.o
-*.a
-*.lib
+# Visual Studio 2026 GitIgnore
 
-# Ignore Visual Studio / build files
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleasenoopt/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio cache and settings
+.vs/
+.vstools/
 *.user
 *.suo
-*.vcxproj.*
-*.ncb
-*.pdb
-*.idb
-*.ilk
-*.log
-*.tmp
+*.userosscache
+*.sln.docstates
 
-# Ignore folders
-Debug/
-Release/
-build/
+## MSBuild intermediate and build outputs
+*.[Oo]bj
+*.tlog
+*.lastbuildstate
+*.idb
+*.pdb
+*.ilk
+*.aps
+*.res
+*.pch
+*.lib
+*.sbr
+*.exp
+
+## Visual Studio Profiling Tools
+*.vsp
+*.vspx
+*.sap
+
+## Visual Studio Code
+.vscode/
+
+## Others
+*.exe
+*.dll
+*.pri
+*.appx
+*.appxbundle
+*.appxrecipe
+*.asmmeta
+*.winmd
+*.metagen
+ipch/
+*.VC.db
+*.VC.opendb
