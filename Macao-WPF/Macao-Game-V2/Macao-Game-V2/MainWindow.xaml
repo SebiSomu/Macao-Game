@@ -1,0 +1,111 @@
+<Window x:Class="Macao_Game_V2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Macao Game" Height="650" Width="900" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style x:Key="CardButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="80"/>
+            <Setter Property="Height" Value="120"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="#FFAAAAAA"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFE0E0E0"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#2C3E50" Offset="0.0"/>
+                <GradientStop Color="#4CA1AF" Offset="1.0"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top: AI info & Game Messages -->
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="10">
+            <TextBlock x:Name="AiStatusText" Text="AI Cards: 5" FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="GameMessageText" Text="Welcome to Macao!" FontSize="18" Foreground="#FFFFD700" Margin="0,5,0,0" TextWrapping="Wrap" TextAlignment="Center"/>
+            <TextBlock x:Name="TurnText" Text="Your Turn" FontSize="16" Foreground="LightGreen" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <!-- Middle: Deck and Discard Pile -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            
+            <StackPanel Margin="20">
+                <TextBlock Text="Draw Pile" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                <Button x:Name="DrawPileButton" Style="{StaticResource CardButtonStyle}" Click="DrawPile_Click" Background="#FF2B2B2B">
+                    <Button.Content>
+                        <TextBlock Text="DRAW" Foreground="White" FontSize="18"/>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+
+            <StackPanel Margin="20">
+                <TextBlock Text="Top Card" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                <Border x:Name="DiscardPileBorder" Width="80" Height="120" Background="White" CornerRadius="10" BorderBrush="Black" BorderThickness="2">
+                    <TextBlock x:Name="TopCardText" Text="7♠" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" FontWeight="Bold" Foreground="Black"/>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Margin="20" VerticalAlignment="Center">
+                <TextBlock x:Name="CardsToDrawText" Text="Penalty: 0" Foreground="#FFFF5555" FontSize="16" FontWeight="Bold" Visibility="Hidden"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Bottom: Player Hand -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" Margin="20" VerticalAlignment="Bottom">
+            <WrapPanel x:Name="PlayerHandPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
+        </ScrollViewer>
+
+        <!-- Suit Selection Overlay -->
+        <Grid x:Name="SuitSelectionOverlay" Grid.RowSpan="3" Background="#AA000000" Visibility="Hidden">
+            <Border Background="White" CornerRadius="15" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="30">
+                <StackPanel>
+                    <TextBlock Text="Choose a Suit" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                    <UniformGrid Columns="2" Rows="2" Width="200" Height="200">
+                        <Button Content="♠" FontSize="40" Foreground="Black" Margin="5" Click="Suit_Click"/>
+                        <Button Content="♥" FontSize="40" Foreground="Red" Margin="5" Click="Suit_Click"/>
+                        <Button Content="♦" FontSize="40" Foreground="Red" Margin="5" Click="Suit_Click"/>
+                        <Button Content="♣" FontSize="40" Foreground="Black" Margin="5" Click="Suit_Click"/>
+                    </UniformGrid>
+                </StackPanel>
+            </Border>
+        </Grid>
+        
+        <!-- Game Over Overlay -->
+        <Grid x:Name="GameOverOverlay" Grid.RowSpan="3" Background="#EE000000" Visibility="Hidden">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock x:Name="GameOverText" Text="Game Over" FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                <Button Content="Play Again" FontSize="24" Padding="20,10" HorizontalAlignment="Center" Click="RestartGame_Click"/>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</Window>

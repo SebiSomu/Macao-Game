@@ -14,6 +14,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+bin/
+obj/
+publish/
 
 ## Visual Studio cache and settings
 .vs/
@@ -22,6 +25,8 @@ bld/
 *.suo
 *.userosscache
 *.sln.docstates
+*.slnx.user
+*.slnx.docstates
 
 ## MSBuild intermediate and build outputs
 *.[Oo]bj
@@ -58,3 +63,8 @@ bld/
 ipch/
 *.VC.db
 *.VC.opendb
+
+# Project specific additions (Macao WPF)
+suggestive-output/
+*.log
+*.logs
