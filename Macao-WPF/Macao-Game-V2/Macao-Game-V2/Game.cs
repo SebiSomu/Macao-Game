@@ -27,6 +27,7 @@ namespace Macao_Game_V2
         public int CardsToDraw => _cardsToDraw;
         public bool IsHumanTurn => _isHumanTurn;
         public bool IsGameOver => _isGameOver;
+        public string CurrentTurnCardValue { get; private set; }
 
         public Game()
         {
@@ -44,6 +45,7 @@ namespace Macao_Game_V2
             _cardsToDraw = 0;
             _skipNextTurn = false;
             _isGameOver = false;
+            CurrentTurnCardValue = null;
 
             // Deal 5 cards each
             for (int i = 0; i < 5; i++)
@@ -99,13 +101,25 @@ namespace Macao_Game_V2
         {
             if (!_isHumanTurn || _isGameOver) return false;
 
-            if (!card.IsCardValid(TopCard, _cardsToDraw))
+            if (CurrentTurnCardValue != null)
             {
-                OnGameMessage?.Invoke("Invalid card! Choose another.");
-                return false;
+                if (card.Value != CurrentTurnCardValue)
+                {
+                    OnGameMessage?.Invoke($"You must play a {CurrentTurnCardValue} or click END TURN to finish.");
+                    return false;
+                }
+            }
+            else
+            {
+                if (!card.IsCardValid(TopCard, _cardsToDraw))
+                {
+                    OnGameMessage?.Invoke("Invalid card! Choose another.");
+                    return false;
+                }
             }
 
             _humanPlayer.RemoveCardFromHand(card);
+            CurrentTurnCardValue = card.Value;
             
             if (card.Value == "7")
             {
@@ -137,11 +151,26 @@ namespace Macao_Game_V2
                 return;
             }
 
+            if (_humanPlayer.HasCardWithValue(CurrentTurnCardValue))
+            {
+                OnGameMessage?.Invoke($"You can play another {CurrentTurnCardValue} or click END TURN.");
+                OnGameStateChanged?.Invoke();
+            }
+            else
+            {
+                EndHumanTurn();
+            }
+        }
+
+        public void HumanEndTurnEarly()
+        {
+            if (!_isHumanTurn || _isGameOver || CurrentTurnCardValue == null) return;
             EndHumanTurn();
         }
 
         private void EndHumanTurn()
         {
+            CurrentTurnCardValue = null;
             _isHumanTurn = false;
             OnGameStateChanged?.Invoke();
 
@@ -161,34 +190,48 @@ namespace Macao_Game_V2
         private void AITurn()
         {
             if (_isGameOver) return;
+            CurrentTurnCardValue = null;
 
             OnGameMessage?.Invoke("AI is thinking...");
 
-            Card cardToPlay = DetermineAICard();
+            Card firstCard = DetermineAICard();
 
-            if (cardToPlay != null)
+            if (firstCard != null)
             {
-                _computerPlayer.RemoveCardFromHand(cardToPlay);
-
-                if (cardToPlay.Value == "7")
+                List<Card> cardsToPlay = new List<Card> { firstCard };
+                
+                var moreCards = _computerPlayer.GetCardsWithValue(firstCard.Value);
+                foreach (var c in moreCards)
                 {
-                    cardToPlay.Suit = AIChooseSuit();
-                    OnGameMessage?.Invoke($"AI played a 7 and chose {cardToPlay.Suit}");
-                }
-                else
-                {
-                    OnGameMessage?.Invoke($"AI played: {cardToPlay}");
+                    if (c != firstCard) cardsToPlay.Add(c);
                 }
 
-                _discardPile.Push(cardToPlay);
-                ApplyCardEffects(cardToPlay);
-
-                if (_computerPlayer.HasWon())
+                foreach (var cardToPlay in cardsToPlay)
                 {
-                    _isGameOver = true;
-                    OnGameOver?.Invoke("AI won!");
-                    OnGameStateChanged?.Invoke();
-                    return;
+                    _computerPlayer.RemoveCardFromHand(cardToPlay);
+
+                    if (cardToPlay.Value == "7")
+                    {
+                        cardToPlay.Suit = AIChooseSuit();
+                    }
+
+                    _discardPile.Push(cardToPlay);
+                    ApplyCardEffects(cardToPlay);
+
+                    if (_computerPlayer.HasWon())
+                    {
+                        _isGameOver = true;
+                        OnGameOver?.Invoke("AI won!");
+                        OnGameStateChanged?.Invoke();
+                        return;
+                    }
+                }
+
+                string cardNames = string.Join(", ", cardsToPlay.Select(c => c.ToString()));
+                if (cardsToPlay[0].Value == "7") {
+                    OnGameMessage?.Invoke($"AI played 7s: {cardNames} and chose suit {cardsToPlay.Last().Suit}");
+                } else {
+                    OnGameMessage?.Invoke($"AI played: {cardNames}");
                 }
             }
             else

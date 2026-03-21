@@ -57,6 +57,12 @@ namespace Macao_Game_V2
                 TopCardText.Foreground = (_game.TopCard.Suit == '♥' || _game.TopCard.Suit == '♦') ? Brushes.Red : Brushes.Black;
             }
 
+            // Draw Pile / End Turn button text
+            if (DrawPileButton.Content is TextBlock tb)
+            {
+                tb.Text = _game.CurrentTurnCardValue != null ? "END TURN" : "DRAW";
+            }
+
             // Render Player Hand
             PlayerHandPanel.Children.Clear();
             foreach (var card in _game.HumanPlayer.Hand)
@@ -107,7 +113,14 @@ namespace Macao_Game_V2
         {
             if (!_game.IsHumanTurn || SuitSelectionOverlay.Visibility == Visibility.Visible) return;
             
-            _game.HumanDrawCards();
+            if (_game.CurrentTurnCardValue != null)
+            {
+                _game.HumanEndTurnEarly();
+            }
+            else
+            {
+                _game.HumanDrawCards();
+            }
         }
 
         private void Suit_Click(object sender, RoutedEventArgs e)

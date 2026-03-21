@@ -68,7 +68,7 @@ namespace Macao_Game_V2
             return !(card1 == card2);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is Card c)
                 return this == c;
