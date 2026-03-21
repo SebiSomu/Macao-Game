@@ -41,6 +41,36 @@ namespace Macao_Game_V2
             TurnText.Text = _game.IsHumanTurn ? "Your Turn" : "AI is playing...";
             TurnText.Foreground = _game.IsHumanTurn ? Brushes.LightGreen : Brushes.Orange;
 
+            // Render AI Hand (Debug/Testing)
+            /*
+            AiHandPanel.Children.Clear();
+            foreach (var card in _game.ComputerPlayer.Hand)
+            {
+                Border cardBorder = new Border
+                {
+                    Background = Brushes.White,
+                    BorderBrush = Brushes.Gray,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(3),
+                    Margin = new Thickness(2),
+                    Padding = new Thickness(3),
+                    Width = 40,
+                    Height = 60
+                };
+                TextBlock aiTb = new TextBlock
+                {
+                    Text = card.ToString(),
+                    FontSize = 14,
+                    FontWeight = FontWeights.Bold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = (card.Suit == '♥' || card.Suit == '♦') ? Brushes.Red : Brushes.Black
+                };
+                cardBorder.Child = aiTb;
+                AiHandPanel.Children.Add(cardBorder);
+            }
+            */
+
             // Penalty
             if (_game.CardsToDraw > 0)
             {

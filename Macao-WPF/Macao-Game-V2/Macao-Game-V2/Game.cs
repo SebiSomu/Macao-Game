@@ -194,6 +194,221 @@ namespace Macao_Game_V2
             AITurn();
         }
 
+        private List<Card> EnsureValidFirstCard(List<Card> selectedCards)
+        {
+            if (selectedCards == null || selectedCards.Count == 0) return new List<Card>();
+
+            List<Card> reordered = new List<Card>(selectedCards);
+            for (int i = 0; i < reordered.Count; i++)
+            {
+                if (reordered[i].IsCardValid(TopCard, _cardsToDraw))
+                {
+                    if (i != 0)
+                    {
+                        Card temp = reordered[0];
+                        reordered[0] = reordered[i];
+                        reordered[i] = temp;
+                    }
+                    break;
+                }
+            }
+            return reordered;
+        }
+
+        private char GetMostFrequentSuit(List<Card> excludeCards = null, bool excludeSpecials = true)
+        {
+            if (excludeCards == null) excludeCards = new List<Card>();
+            var suitFrequency = new Dictionary<char, int>();
+
+            foreach (var card in _computerPlayer.Hand)
+            {
+                bool isExcluded = excludeCards.Exists(c => c == card);
+                if (!isExcluded)
+                {
+                    if (!excludeSpecials || (!card.IsJoker && card.Value != "7"))
+                    {
+                        if (!suitFrequency.ContainsKey(card.Suit))
+                            suitFrequency[card.Suit] = 0;
+                        suitFrequency[card.Suit]++;
+                    }
+                }
+            }
+
+            char bestSuit = ' ';
+            int maxCount = -1;
+            foreach (var kvp in suitFrequency)
+            {
+                if (kvp.Value > maxCount)
+                {
+                    maxCount = kvp.Value;
+                    bestSuit = kvp.Key;
+                }
+            }
+
+            if (maxCount <= 0 || (bestSuit != '♠' && bestSuit != '♥' && bestSuit != '♦' && bestSuit != '♣'))
+            {
+                char[] suits = { '♠', '♥', '♦', '♣' };
+                bestSuit = suits[new Random().Next(4)];
+            }
+
+            return bestSuit;
+        }
+
+        private List<Card> AISelectCards()
+        {
+            var hand = _computerPlayer.Hand;
+            var validCardsByValue = new Dictionary<string, List<Card>>();
+
+            if (_cardsToDraw > 0)
+            {
+                foreach (var card in hand)
+                {
+                    if (card.Value == "2" || card.Value == "3" || card.IsJoker)
+                    {
+                        if (!validCardsByValue.ContainsKey(card.Value)) validCardsByValue[card.Value] = new List<Card>();
+                        validCardsByValue[card.Value].Add(card);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var card in hand)
+                {
+                    if (card.IsCardValid(TopCard, _cardsToDraw))
+                    {
+                        if (!validCardsByValue.ContainsKey(card.Value)) validCardsByValue[card.Value] = new List<Card>();
+                        validCardsByValue[card.Value].Add(card);
+                    }
+                }
+            }
+
+            // Ace combo
+            foreach (var ace in hand)
+            {
+                if (ace.Value == "A" && ace.IsCardValid(TopCard, _cardsToDraw))
+                {
+                    foreach (var other in hand)
+                    {
+                        if (other != ace && other.Suit == ace.Suit)
+                        {
+                            return new List<Card> { ace, other };
+                        }
+                    }
+                }
+            }
+
+            if (validCardsByValue.Count == 0)
+            {
+                if (_cardsToDraw == 0)
+                {
+                    foreach (var c in hand) if (c.Value == "7") return new List<Card> { c };
+                    foreach (var c in hand) if (c.IsJoker) return new List<Card> { c };
+                }
+                return new List<Card>();
+            }
+
+            var fullGroups = new Dictionary<string, List<Card>>();
+            foreach (var kvp in validCardsByValue)
+            {
+                string value = kvp.Key;
+                var allCardsOfValue = hand.Where(c => c.Value == value).ToList();
+                fullGroups[value] = allCardsOfValue;
+            }
+
+            List<Card> bestSelection = new List<Card>();
+            int bestScore = -1;
+
+            foreach (var kvp in fullGroups)
+            {
+                string value = kvp.Key;
+                var cards = kvp.Value;
+                if (cards.Count == 0) continue;
+
+                bool isInflate = (value == "2" || value == "3" || cards[0].IsJoker);
+
+                if (isInflate && cards.Count > 1)
+                {
+                    Random random = new Random();
+                    if (random.Next(100) >= 10) // 90% chance to only play one and save the rest
+                    {
+                        int score = 1;
+                        if (score > bestScore)
+                        {
+                            bestScore = score;
+                            bestSelection = new List<Card> { cards[0] };
+                        }
+                        continue;
+                    }
+                }
+
+                int currentScore = cards.Count;
+                if (currentScore > bestScore)
+                {
+                    bestScore = currentScore;
+                    bestSelection = new List<Card>(cards);
+                }
+            }
+
+            if (bestSelection.Count > 1)
+            {
+                List<Card> reordered = new List<Card>();
+                Card firstCard = bestSelection[0];
+
+                foreach (var card in bestSelection)
+                {
+                    if (card.IsCardValid(TopCard, _cardsToDraw))
+                    {
+                        firstCard = card;
+                        break;
+                    }
+                }
+
+                reordered.Add(firstCard);
+                foreach (var card in bestSelection)
+                {
+                    if (card != firstCard) reordered.Add(card);
+                }
+
+                char bestSuit = GetMostFrequentSuit(reordered);
+                for (int i = 1; i < reordered.Count; i++)
+                {
+                    if (reordered[i].Suit == bestSuit && !reordered[i].IsJoker)
+                    {
+                        Card temp = reordered[i];
+                        reordered.RemoveAt(i);
+                        reordered.Add(temp);
+                        break;
+                    }
+                }
+                bestSelection = reordered;
+            }
+
+            if (bestSelection.Count == 0)
+            {
+                foreach (var c in hand) if (c.IsJoker) return new List<Card> { c };
+            }
+
+            if (bestSelection.Count > 0 && bestSelection[0].Value == "7")
+            {
+                char bestSuit = GetMostFrequentSuit(new List<Card>(), excludeSpecials: false);
+                if (bestSelection.Count > 1)
+                {
+                    var first = bestSelection[0];
+                    var rest = bestSelection.Skip(1).ToList();
+                    rest.Sort((a, b) =>
+                    {
+                        if (a.Suit == bestSuit && b.Suit != bestSuit) return 1;
+                        if (a.Suit != bestSuit && b.Suit == bestSuit) return -1;
+                        return string.Compare(a.Value, b.Value);
+                    });
+                    bestSelection = new List<Card> { first };
+                    bestSelection.AddRange(rest);
+                }
+            }
+
+            return bestSelection;
+        }
+
         private void AITurn()
         {
             if (_isGameOver) return;
@@ -201,25 +416,18 @@ namespace Macao_Game_V2
 
             OnGameMessage?.Invoke("AI is thinking...");
 
-            Card firstCard = DetermineAICard();
+            List<Card> cardsToPlay = AISelectCards();
+            cardsToPlay = EnsureValidFirstCard(cardsToPlay);
 
-            if (firstCard != null)
+            if (cardsToPlay != null && cardsToPlay.Count > 0)
             {
-                List<Card> cardsToPlay = new List<Card> { firstCard };
-                
-                var moreCards = _computerPlayer.GetCardsWithValue(firstCard.Value);
-                foreach (var c in moreCards)
-                {
-                    if (c != firstCard) cardsToPlay.Add(c);
-                }
-
                 foreach (var cardToPlay in cardsToPlay)
                 {
                     _computerPlayer.RemoveCardFromHand(cardToPlay);
 
                     if (cardToPlay.Value == "7")
                     {
-                        cardToPlay.Suit = AIChooseSuit();
+                        cardToPlay.Suit = GetMostFrequentSuit(excludeSpecials: false);
                     }
 
                     _discardPile.Push(cardToPlay);
@@ -237,6 +445,8 @@ namespace Macao_Game_V2
                 string cardNames = string.Join(", ", cardsToPlay.Select(c => c.ToString()));
                 if (cardsToPlay[0].Value == "7") {
                     OnGameMessage?.Invoke($"AI played 7s: {cardNames} and chose suit {cardsToPlay.Last().Suit}");
+                } else if (cardsToPlay[0].Value == "A") {
+                    OnGameMessage?.Invoke($"AI played Ace combo: {cardNames}");
                 } else {
                     OnGameMessage?.Invoke($"AI played: {cardNames}");
                 }
@@ -276,28 +486,6 @@ namespace Macao_Game_V2
                 OnGameMessage?.Invoke("Your turn.");
             }
         }
-
-        private Card DetermineAICard()
-        {
-            foreach (var card in _computerPlayer.Hand)
-            {
-                if (card.IsCardValid(TopCard, _cardsToDraw))
-                {
-                    return card;
-                }
-            }
-            return null;
-        }
-
-        private char AIChooseSuit()
-        {
-            var suits = _computerPlayer.Hand.Where(c => !c.IsJoker).GroupBy(c => c.Suit).OrderByDescending(g => g.Count()).FirstOrDefault();
-            if (suits != null && suits.Key != ' ') return suits.Key;
-
-            char[] possibleSuits = { '♠', '♥', '♦', '♣' };
-            return possibleSuits[new Random().Next(4)];
-        }
-
         private void ApplyCardEffects(Card card)
         {
             if (card.Value == "2") _cardsToDraw += 2;
