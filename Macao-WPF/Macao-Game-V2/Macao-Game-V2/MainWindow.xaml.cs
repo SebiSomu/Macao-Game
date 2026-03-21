@@ -9,6 +9,8 @@ namespace Macao_Game_V2
     {
         private Game _game;
         private Card _pendingSevenCard;
+        private int _humanWins = 0;
+        private int _aiWins = 0;
 
         public MainWindow()
         {
@@ -97,6 +99,11 @@ namespace Macao_Game_V2
         {
             GameOverText.Text = message;
             GameOverOverlay.Visibility = Visibility.Visible;
+            if (message.Contains("You")) _humanWins++;
+            else if (message.Contains("AI")) _aiWins++;
+            
+            HumanWinsText.Text = $"Your Wins: {_humanWins}";
+            AiWinsText.Text = $"AI Wins: {_aiWins}";
         }
 
         private void CardBtn_Click(object sender, RoutedEventArgs e)

@@ -56,11 +56,18 @@ namespace Macao_Game_V2
 
             // Start discard pile with a non-action card if possible, or just standard play
             Card firstCard = _deck.DrawCard();
-            while (firstCard.Value == "2" || firstCard.Value == "3" || firstCard.Value == "4" || 
-                   firstCard.Value == "7" || firstCard.Value == "A" || firstCard.IsJoker)
+            List<Card> invalidCards = new List<Card>();
+            while (firstCard != null && (firstCard.Value == "2" || firstCard.Value == "3" || 
+                   firstCard.Value == "7" || firstCard.Value == "A" || 
+                   firstCard.IsJoker))
             {
-                _deck.Reshuffle(new List<Card> { firstCard });
+                invalidCards.Add(firstCard);
                 firstCard = _deck.DrawCard();
+            }
+            
+            if (invalidCards.Count > 0)
+            {
+                _deck.Reshuffle(invalidCards);
             }
             
             _discardPile.Push(firstCard);

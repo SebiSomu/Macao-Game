@@ -49,11 +49,17 @@
         </Grid.RowDefinitions>
 
         <!-- Top: AI info & Game Messages -->
-        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="10">
-            <TextBlock x:Name="AiStatusText" Text="AI Cards: 5" FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-            <TextBlock x:Name="GameMessageText" Text="Welcome to Macao!" FontSize="18" Foreground="#FFFFD700" Margin="0,5,0,0" TextWrapping="Wrap" TextAlignment="Center"/>
-            <TextBlock x:Name="TurnText" Text="Your Turn" FontSize="16" Foreground="LightGreen" HorizontalAlignment="Center" Margin="0,5,0,0"/>
-        </StackPanel>
+        <Grid Grid.Row="0">
+            <StackPanel HorizontalAlignment="Center" Margin="10">
+                <TextBlock x:Name="AiStatusText" Text="AI Cards: 5" FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                <TextBlock x:Name="GameMessageText" Text="Welcome to Macao!" FontSize="18" Foreground="#FFFFD700" Margin="0,5,0,0" TextWrapping="Wrap" TextAlignment="Center"/>
+                <TextBlock x:Name="TurnText" Text="Your Turn" FontSize="16" Foreground="LightGreen" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="20">
+                <TextBlock x:Name="HumanWinsText" Text="Your Wins: 0" FontSize="16" FontWeight="Bold" Foreground="LightGreen" />
+                <TextBlock x:Name="AiWinsText" Text="AI Wins: 0" FontSize="16" FontWeight="Bold" Foreground="Orange" />
+            </StackPanel>
+        </Grid>
 
         <!-- Middle: Deck and Discard Pile -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
