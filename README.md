@@ -6,9 +6,10 @@ A modern, SOLID-principled implementation of the classic Macao card game with a 
 
 Macao is a strategic card game where players take turns playing cards that match the top card's value or suit. The game features special cards with unique effects:
 
-- **7 Cards**: Force the next player to draw 2 cards OR change the suit
+- **7 Cards**: Wild cards that can be played anytime and allow suit selection
 - **Aces**: Skip the next player's turn
-- **Jokers**: Wild cards that can be played anytime and allow suit selection
+- **2s and 3s**: Force your opponent to draw 2 or 3 cards respectively
+- **Jokers**: Force your opponent to draw 5 cards
 - **Number Cards**: Standard matching gameplay
 
 ## 🏗️ Architecture
