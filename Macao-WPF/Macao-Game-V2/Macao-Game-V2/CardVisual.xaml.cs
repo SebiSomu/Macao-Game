@@ -344,14 +344,6 @@ namespace Macao_Game_V2
             // Filigree corner dots inside frame
             AddFrameCornerOrnaments(root, fx, fy, fw, fh, color);
 
-            // ── Layout zones (no overlap) ────────────────────────────────────────
-            // Frame interior: fy+2 .. fy+fh-2  (approx Y 22..98, height 76)
-            // Zone 1 — top ornament suit:   Y 24..36  (12px zone)
-            // Zone 2 — large letter:        Y 36..72  (36px zone)
-            // Zone 3 — divider line:        Y 72
-            // Zone 4 — center suit symbol:  Y 74..90  (16px zone)
-            // Zone 5 — bottom ornament:     Y 90..96  (6px zone)
-
             double cx = fx + fw / 2.0; // horizontal center of frame
 
             // Zone 1 — small suit top (upright)

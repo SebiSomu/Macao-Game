@@ -82,17 +82,27 @@ namespace Macao_Game_V2
             return cardIsJoker;
         }
 
-        public bool IsCardValid(Card topCard, int cardsToDraw)
+        public bool IsCardValid(Card topCard, int cardsToDraw, string currentTurnCardValue = null)
         {
             if (cardsToDraw > 0)
                 return (cardValue == "2" || cardValue == "3" || cardIsJoker);
 
+            // If a specific card value is required (e.g., after playing a 7), only allow that value
+            if (!string.IsNullOrEmpty(currentTurnCardValue))
+            {
+                if (cardValue != currentTurnCardValue)
+                    return false;
+            }
+
+            // Special cards that can always be played
             if (cardIsJoker || cardValue == "7")
                 return true;
 
+            // If top card is a Joker, any card can be played
             if (topCard.cardIsJoker)
                 return true;
 
+            // Normal matching rules
             return (cardSuit == topCard.cardSuit || cardValue == topCard.cardValue);
         }
 
