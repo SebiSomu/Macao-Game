@@ -38,6 +38,10 @@
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="CardBorder" Property="Opacity" Value="0.5"/>
+                                <Setter Property="Cursor" Value="No"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>

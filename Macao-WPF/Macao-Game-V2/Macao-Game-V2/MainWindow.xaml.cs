@@ -75,6 +75,7 @@ namespace Macao_Game_V2
                 // Check if card is playable
                 bool isValid = card.IsCardValid(_game.TopCard, _game.CardsToDraw, _game.CurrentTurnCardValue);
                 cardBtn.Cursor = isValid ? Cursors.Hand : Cursors.No;
+                cardBtn.IsEnabled = isValid;
                 
                 // Use CardVisual for the card face
                 var cardVisual = new CardVisual();
