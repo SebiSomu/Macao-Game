@@ -24,6 +24,10 @@ namespace Macao_Game_V2
             DependencyProperty.Register("IsFaceDown", typeof(bool), typeof(CardVisual),
                 new PropertyMetadata(false, OnIsFaceDownChanged));
 
+        public static readonly DependencyProperty IsDarkModeProperty =
+            DependencyProperty.Register("IsDarkMode", typeof(bool), typeof(CardVisual),
+                new PropertyMetadata(false, OnDarkModeChanged));
+
         public Card Card
         {
             get => (Card)GetValue(CardProperty);
@@ -36,6 +40,12 @@ namespace Macao_Game_V2
             set => SetValue(IsFaceDownProperty, value);
         }
 
+        public bool IsDarkMode
+        {
+            get => (bool)GetValue(IsDarkModeProperty);
+            set => SetValue(IsDarkModeProperty, value);
+        }
+
         // ── Card dimensions ──────────────────────────────────────────────────────
 
         private const double CardW = 80;
@@ -45,13 +55,42 @@ namespace Macao_Game_V2
 
         // ── Colors ───────────────────────────────────────────────────────────────
 
-        private static readonly Brush RedBrush = new SolidColorBrush(Color.FromRgb(185, 20, 20));
-        private static readonly Brush BlackBrush = new SolidColorBrush(Color.FromRgb(15, 15, 15));
-        private static readonly Brush WhiteBrush = Brushes.White;
+        // Light Mode Colors
+        private static readonly Brush LightRedBrush = new SolidColorBrush(Color.FromRgb(185, 20, 20));
+        private static readonly Brush LightBlackBrush = new SolidColorBrush(Color.FromRgb(15, 15, 15));
+        private static readonly Brush LightWhiteBrush = Brushes.White;
+        private static readonly Brush LightPaperColor = new SolidColorBrush(Color.FromRgb(253, 251, 244));
+
+        // Dark Mode Colors
+        private static readonly Brush DarkRedBrush = new SolidColorBrush(Color.FromRgb(220, 50, 50));
+        private static readonly Brush DarkWhiteBrush = new SolidColorBrush(Color.FromRgb(240, 240, 240));
+        private static readonly Brush DarkPaperColor = new SolidColorBrush(Color.FromRgb(20, 20, 20));
+        private static readonly Brush DarkBorderBrush = new SolidColorBrush(Color.FromRgb(100, 100, 100));
+
+        // Card Back Colors
         private static readonly Brush BackBlue = new SolidColorBrush(Color.FromRgb(12, 36, 97));
         private static readonly Brush BackAccent = new SolidColorBrush(Color.FromRgb(30, 70, 180));
         private static readonly Brush BackBorder = new SolidColorBrush(Color.FromRgb(200, 160, 60));
-        private static readonly Brush PaperColor = new SolidColorBrush(Color.FromRgb(253, 251, 244));
+
+        // ── Color getters based on mode ───────────────────────────────────────────
+
+        private Brush GetColor(bool isRed, bool isDarkMode)
+        {
+            if (isDarkMode)
+                return isRed ? DarkRedBrush : DarkWhiteBrush;
+            else
+                return isRed ? LightRedBrush : LightBlackBrush;
+        }
+
+        private Brush GetPaperColor(bool isDarkMode)
+        {
+            return isDarkMode ? DarkPaperColor : LightPaperColor;
+        }
+
+        private Brush GetBorderColor(bool isDarkMode)
+        {
+            return isDarkMode ? DarkBorderBrush : Brushes.Transparent;
+        }
 
         // ── Font ─────────────────────────────────────────────────────────────────
 
@@ -82,6 +121,9 @@ namespace Macao_Game_V2
         private static void OnIsFaceDownChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
             => ((CardVisual)d).UpdateVisual();
 
+        private static void OnDarkModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            => ((CardVisual)d).UpdateVisual();
+
         // ── Main render dispatcher ───────────────────────────────────────────────
 
         private void UpdateVisual()
@@ -102,8 +144,8 @@ namespace Macao_Game_V2
         {
             var root = new Canvas { Width = CardW, Height = CardH };
 
-            // White card base with shadow
-            root.Children.Add(MakeCardRect(PaperColor));
+            // Card base with shadow
+            root.Children.Add(MakeCardRect(GetPaperColor(IsDarkMode)));
 
             // Outer gold border (thin frame inset)
             root.Children.Add(MakeRect(4, 4, CardW - 8, CardH - 8, Brushes.Transparent, BackBorder, 1.5));
@@ -153,15 +195,17 @@ namespace Macao_Game_V2
             if (Card == null) return;
 
             bool isRed = Card.Suit == '♥' || Card.Suit == '♦';
-            Brush color = isRed ? RedBrush : BlackBrush;
+            Brush color = GetColor(isRed, IsDarkMode);
             string suit = Card.Suit.ToString();
 
             var root = new Canvas { Width = CardW, Height = CardH };
-            root.Children.Add(MakeCardRect(PaperColor));
+            root.Children.Add(MakeCardRect(GetPaperColor(IsDarkMode)));
 
-            // Fine inset border line
+            // Fine inset border line (more visible in dark mode)
+            var borderBrush = GetBorderColor(IsDarkMode);
+            double borderOpacity = IsDarkMode ? 0.8 : 0.3;
             root.Children.Add(MakeRect(3, 3, CardW - 6, CardH - 6, Brushes.Transparent,
-                new SolidColorBrush(Color.FromArgb(60, 0, 0, 0)), 0.5));
+                new SolidColorBrush(Color.FromArgb((byte)(255 * borderOpacity), 100, 100, 100)), 0.5));
 
             if (Card.IsJoker)
             {
@@ -538,19 +582,21 @@ namespace Macao_Game_V2
             };
         }
 
-        private static UIElement AddDropShadow(UIElement element)
+        private Border AddDropShadow(Canvas canvas)
         {
+            // Wrap canvas in a border for shadow effect
             var border = new Border
             {
-                Child = element,
-                Effect = new DropShadowEffect
-                {
-                    ShadowDepth = 2,
-                    BlurRadius = 6,
-                    Opacity = 0.25,
-                    Color = Colors.Black,
-                    Direction = 270
-                }
+                Child = canvas,
+                CornerRadius = new CornerRadius(Radius)
+            };
+            border.Effect = new DropShadowEffect
+            {
+                Color = Colors.Black,
+                Direction = 315,
+                ShadowDepth = IsDarkMode ? 2 : 3,
+                Opacity = IsDarkMode ? 0.6 : 0.3,
+                BlurRadius = IsDarkMode ? 4 : 5
             };
             return border;
         }

@@ -55,18 +55,36 @@
     </Window.Resources>
 
     <Grid>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#2C3E50" Offset="0.0"/>
-                <GradientStop Color="#4CA1AF" Offset="1.0"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+        <!-- Background will be set dynamically from code-behind -->
         
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
+
+        <!-- Dark Mode Toggle Button -->
+        <Button x:Name="DarkModeToggle" Width="60" Height="60" 
+                HorizontalAlignment="Left" VerticalAlignment="Top" 
+                Margin="20,10,0,0" Background="Transparent" BorderThickness="0"
+                Click="DarkModeToggle_Click" Cursor="Hand">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Ellipse x:Name="ToggleCircle" Width="50" Height="50" 
+                                Fill="#FF333333" Stroke="#FF666666" StrokeThickness="2"/>
+                        <TextBlock x:Name="ToggleIcon" Text="☀️" FontSize="28" 
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ToggleCircle" Property="Fill" Value="#FF444444"/>
+                            <Setter TargetName="ToggleCircle" Property="Stroke" Value="#FF888888"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
 
         <!-- Top: AI info & Game Messages -->
         <Grid Grid.Row="0">

@@ -13,6 +13,18 @@ namespace Macao_Game_V2
         private Card _pendingSevenCard;
         private int _humanWins = 0;
         private int _aiWins = 0;
+        private bool _isDarkMode = false;
+        private LinearGradientBrush _backgroundBrush;
+
+        public bool IsDarkMode
+        {
+            get => _isDarkMode;
+            set
+            {
+                _isDarkMode = value;
+                UpdateCardDarkMode();
+            }
+        }
 
         public MainWindow()
         {
@@ -23,6 +35,12 @@ namespace Macao_Game_V2
             _game.OnGameMessage += ShowMessage;
             _game.OnSuitSelectionRequired += AskForSuit;
             _game.OnGameOver += HandleGameOver;
+
+            // Initialize dark mode toggle
+            UpdateDarkModeToggle();
+            
+            // Initialize background
+            UpdateAppBackground();
 
             StartNewGame();
         }
@@ -57,6 +75,7 @@ namespace Macao_Game_V2
             {
                 TopCardVisual.Card = _game.TopCard;
                 TopCardVisual.IsFaceDown = false;
+                TopCardVisual.IsDarkMode = _isDarkMode;
             }
 
             // Draw Pile / End Turn button text
@@ -83,6 +102,7 @@ namespace Macao_Game_V2
                 var cardVisual = new CardVisual();
                 cardVisual.Card = (Card)card;
                 cardVisual.IsFaceDown = false;
+                cardVisual.IsDarkMode = _isDarkMode;
                 cardBtn.Content = cardVisual;
 
                 cardBtn.Click += CardBtn_Click;
@@ -148,6 +168,81 @@ namespace Macao_Game_V2
         private void RestartGame_Click(object sender, RoutedEventArgs e)
         {
             StartNewGame();
+        }
+
+        private void UpdateCardDarkMode()
+        {
+            // Update top card
+            if (TopCardVisual != null)
+            {
+                TopCardVisual.IsDarkMode = _isDarkMode;
+            }
+
+            // Update all player cards
+            foreach (UIElement element in PlayerHandPanel.Children)
+            {
+                if (element is Button btn && btn.Content is CardVisual cardVisual)
+                {
+                    cardVisual.IsDarkMode = _isDarkMode;
+                }
+            }
+
+            // Update app background
+            UpdateAppBackground();
+
+            // Update toggle button icon
+            UpdateDarkModeToggle();
+        }
+
+        private void UpdateAppBackground()
+        {
+            if (_isDarkMode)
+            {
+                // Dark mode background
+                var darkBrush = new LinearGradientBrush
+                {
+                    StartPoint = new Point(0, 0),
+                    EndPoint = new Point(1, 1),
+                    GradientStops = new GradientStopCollection
+                    {
+                        new GradientStop(Color.FromRgb(15, 15, 25), 0.0),
+                        new GradientStop(Color.FromRgb(25, 25, 45), 1.0)
+                    }
+                };
+                this.Background = darkBrush;
+            }
+            else
+            {
+                // Light mode background
+                var lightBrush = new LinearGradientBrush
+                {
+                    StartPoint = new Point(0, 0),
+                    EndPoint = new Point(1, 1),
+                    GradientStops = new GradientStopCollection
+                    {
+                        new GradientStop(Color.FromRgb(44, 62, 80), 0.0),
+                        new GradientStop(Color.FromRgb(76, 161, 175), 1.0)
+                    }
+                };
+                this.Background = lightBrush;
+            }
+        }
+
+        private void DarkModeToggle_Click(object sender, RoutedEventArgs e)
+        {
+            IsDarkMode = !_isDarkMode;
+        }
+
+        private void UpdateDarkModeToggle()
+        {
+            if (DarkModeToggle != null)
+            {
+                var icon = DarkModeToggle.Template.FindName("ToggleIcon", DarkModeToggle) as TextBlock;
+                if (icon != null)
+                {
+                    icon.Text = _isDarkMode ? "🌙" : "☀️";
+                }
+            }
         }
     }
 }
