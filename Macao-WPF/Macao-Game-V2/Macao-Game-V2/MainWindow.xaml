@@ -1,36 +1,52 @@
 <Window x:Class="Macao_Game_V2.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Macao_Game_V2"
         Title="Macao Game" Height="650" Width="900" WindowStartupLocation="CenterScreen">
     <Window.Resources>
+        <!-- Card Button Style using CardVisual inside a Button -->
         <Style x:Key="CardButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="80"/>
             <Setter Property="Height" Value="120"/>
             <Setter Property="Margin" Value="5"/>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="BorderBrush" Value="#FFAAAAAA"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" 
                                 BorderBrush="{TemplateBinding BorderBrush}" 
-                                BorderThickness="{TemplateBinding BorderThickness}" 
-                                CornerRadius="10">
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                x:Name="CardBorder">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CardBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="0" BlurRadius="15" Color="White" Opacity="0.6"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="CardBorder" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.95" ScaleY="0.95" CenterX="40" CenterY="60"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFE0E0E0"/>
-                    <Setter Property="Cursor" Value="Hand"/>
-                </Trigger>
-            </Style.Triggers>
+        </Style>
+
+        <!-- Card Back Style for Draw Pile -->
+        <Style x:Key="CardBackStyle" TargetType="Button" BasedOn="{StaticResource CardButtonStyle}">
+            <Setter Property="Background" Value="#FF2B2B2B"/>
         </Style>
     </Window.Resources>
 
@@ -79,7 +95,7 @@
             <StackPanel Margin="20">
                 <TextBlock Text="Top Card" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,5"/>
                 <Border x:Name="DiscardPileBorder" Width="80" Height="120" Background="White" CornerRadius="10" BorderBrush="Black" BorderThickness="2">
-                    <TextBlock x:Name="TopCardText" Text="7♠" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" FontWeight="Bold" Foreground="Black"/>
+                    <local:CardVisual x:Name="TopCardVisual" IsFaceDown="False"/>
                 </Border>
             </StackPanel>
 

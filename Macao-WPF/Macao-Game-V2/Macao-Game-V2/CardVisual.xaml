@@ -1,0 +1,10 @@
+<UserControl x:Class="Macao_Game_V2.CardVisual"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="120" d:DesignWidth="80">
+    <!-- Visual elements are created programmatically in code-behind -->
+    <Grid x:Name="CardContainer" />
+</UserControl>

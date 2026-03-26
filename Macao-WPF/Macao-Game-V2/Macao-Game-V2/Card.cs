@@ -10,11 +10,53 @@ namespace Macao_Game_V2
         private char cardSuit;
         private bool cardIsJoker;
 
+        // Mapping from macao-v1 format letters to Unicode suit symbols
+        private static readonly Dictionary<char, char> SuitLetterToSymbol = new Dictionary<char, char>
+        {
+            { 'S', '♠' },  // Spade
+            { 'H', '♥' },  // Heart
+            { 'D', '♦' },  // Diamond
+            { 'C', '♣' }   // Club
+        };
+
         public Card(string value, char suit, bool joker)
         {
             cardValue = value;
             cardSuit = suit;
             cardIsJoker = joker;
+        }
+
+        public Card(string cardString)
+        {
+            ParseCardString(cardString);
+        }
+
+        private void ParseCardString(string s)
+        {
+            if (s.Trim().Equals("Joker", StringComparison.OrdinalIgnoreCase))
+            {
+                cardValue = "Joker";
+                cardSuit = ' ';
+                cardIsJoker = true;
+            }
+            else if (s.Length >= 3) // Cards like "10T" (10 of Spades)
+            {
+                char suitLetter = s[s.Length - 1];
+                cardValue = s.Substring(0, s.Length - 1);
+                cardSuit = SuitLetterToSymbol.TryGetValue(suitLetter, out char symbol) ? symbol : suitLetter;
+                cardIsJoker = false;
+            }
+            else if (s.Length == 2) // Cards like "2T" (2 of Spades)
+            {
+                char suitLetter = s[1];
+                cardValue = s.Substring(0, 1);
+                cardSuit = SuitLetterToSymbol.TryGetValue(suitLetter, out char symbol) ? symbol : suitLetter;
+                cardIsJoker = false;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid card format: {s}");
+            }
         }
 
         public string Value

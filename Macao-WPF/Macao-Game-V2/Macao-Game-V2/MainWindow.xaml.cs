@@ -85,8 +85,8 @@ namespace Macao_Game_V2
             // Top Card
             if (_game.TopCard != null)
             {
-                TopCardText.Text = _game.TopCard.ToString();
-                TopCardText.Foreground = (_game.TopCard.Suit == '♥' || _game.TopCard.Suit == '♦') ? Brushes.Red : Brushes.Black;
+                TopCardVisual.Card = _game.TopCard;
+                TopCardVisual.IsFaceDown = false;
             }
 
             // Draw Pile / End Turn button text
@@ -95,19 +95,19 @@ namespace Macao_Game_V2
                 tb.Text = _game.CurrentTurnCardValue != null ? "END TURN" : "DRAW";
             }
 
-            // Render Player Hand
+            // Render Player Hand with CardVisual
             PlayerHandPanel.Children.Clear();
             foreach (var card in _game.HumanPlayer.Hand)
             {
                 Button cardBtn = new Button();
                 cardBtn.Style = (Style)FindResource("CardButtonStyle");
-                cardBtn.Content = card.ToString();
                 cardBtn.Tag = card;
                 
-                if (card.Suit == '♥' || card.Suit == '♦')
-                {
-                    cardBtn.Foreground = Brushes.Red;
-                }
+                // Use CardVisual for the card face
+                var cardVisual = new CardVisual();
+                cardVisual.Card = card;
+                cardVisual.IsFaceDown = false;
+                cardBtn.Content = cardVisual;
 
                 cardBtn.Click += CardBtn_Click;
                 PlayerHandPanel.Children.Add(cardBtn);
