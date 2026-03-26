@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
+using Macao_Game_V2.Abstractions;
 
-namespace Macao_Game_V2
+namespace Macao_Game_V2.Domain
 {
-    public class Deck
+    public class Deck : IDeck
     {
-        private List<Card> cards;
-        private Stack<Card> drawPile;
+        private List<ICard> cards;
+        private Stack<ICard> drawPile;
 
         public Deck()
         {
-            cards = new List<Card>();
-            drawPile = new Stack<Card>();
+            cards = new List<ICard>();
+            drawPile = new Stack<ICard>();
             InitializeStandardDeck();
             ShuffleArray();
             CutDeck();
@@ -40,15 +41,15 @@ namespace Macao_Game_V2
             cards.Add(new Card("Joker", ' ', true));
         }
 
-        public void Reshuffle(IEnumerable<Card> discardPileCards)
+        public void Reshuffle(IEnumerable<ICard> discardPileCards)
         {
-            List<Card> tempCards = new List<Card>(discardPileCards);
+            List<ICard> tempCards = new List<ICard>(discardPileCards);
             Random random = new Random();
             int n = tempCards.Count;
             while (n > 1)
             {
                 int k = random.Next(n--);
-                Card temp = tempCards[n];
+                ICard temp = tempCards[n];
                 tempCards[n] = tempCards[k];
                 tempCards[k] = temp;
             }
@@ -66,7 +67,7 @@ namespace Macao_Game_V2
             while (n > 1)
             {
                 int k = random.Next(n--);
-                Card temp = cards[n];
+                ICard temp = cards[n];
                 cards[n] = cards[k];
                 cards[k] = temp;
             }
@@ -76,15 +77,15 @@ namespace Macao_Game_V2
         {
             Random random = new Random();
             int cutPoint = random.Next(1, cards.Count - 1);
-            List<Card> cut1 = cards.GetRange(0, cutPoint);
-            List<Card> cut2 = cards.GetRange(cutPoint, cards.Count - cutPoint);
+            List<ICard> cut1 = cards.GetRange(0, cutPoint);
+            List<ICard> cut2 = cards.GetRange(cutPoint, cards.Count - cutPoint);
             
             cards.Clear();
             cards.AddRange(cut2);
             cards.AddRange(cut1);
         }
 
-        public Card DrawCard()
+        public ICard DrawCard()
         {
             if (drawPile.Count == 0)
             {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
+using Macao_Game_V2.Domain;
 
 namespace Macao_Game_V2
 {

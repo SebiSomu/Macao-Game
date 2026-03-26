@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Macao_Game_V2.Domain;
 
 namespace Macao_Game_V2
 {
@@ -72,14 +73,15 @@ namespace Macao_Game_V2
                 cardBtn.Style = (Style)FindResource("CardButtonStyle");
                 cardBtn.Tag = card;
                 
-                // Check if card is playable
-                bool isValid = card.IsCardValid(_game.TopCard, _game.CardsToDraw, _game.CurrentTurnCardValue);
+                // Check if card is playable using validator
+                var validator = new MacaoCardValidator();
+                bool isValid = validator.IsCardValid(card, _game.TopCard, _game.CardsToDraw, _game.CurrentTurnCardValue);
                 cardBtn.Cursor = isValid ? Cursors.Hand : Cursors.No;
                 cardBtn.IsEnabled = isValid;
                 
                 // Use CardVisual for the card face
                 var cardVisual = new CardVisual();
-                cardVisual.Card = card;
+                cardVisual.Card = (Card)card;
                 cardVisual.IsFaceDown = false;
                 cardBtn.Content = cardVisual;
 
