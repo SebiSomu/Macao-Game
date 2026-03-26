@@ -97,16 +97,28 @@ Macao-Game-V2/
 5. **AI Turn**: Intelligent card selection and automatic play
 6. **Win Conditions**: Empty hand triggers game over screen
 
+![Game Flow 1](suggestive-output/image7.png)
+![Game Flow 2](suggestive-output/image9.png)
+![Game Flow 3](suggestive-output/image10.png)
+![Game Flow 4](suggestive-output/image11.png)
+![Game Flow 5](suggestive-output/image12.png)
+![Game Flow 6](suggestive-output/image13.png)
+![Game Flow 7](suggestive-output/image14.png)
+
 ### Dark Mode (Image 8)
 - **Toggle Button**: Sun/moon icon in top-left corner
 - **Theme Transition**: Complete UI color scheme change
 - **Card Appearance**: Black backgrounds with contrasting text
 - **Background Gradient**: Dark navy theme
 
+![Dark Mode](suggestive-output/image8.png)
+
 ### Multi-Game Stats (Image 15)
 - **Win Tracking**: Human vs AI victories displayed
 - **Persistent Stats**: Counts survive across multiple games
 - **Top-Right Display**: Clean, unobtrusive positioning
+
+![Multi-Game Stats](suggestive-output/image15.png)
 
 ### Forced Draw Scenario (Image 16)
 - **No Valid Cards**: All player cards disabled
@@ -114,11 +126,16 @@ Macao-Game-V2/
 - **Visual Feedback**: Red penalty text shows required cards
 - **State Management**: Proper turn flow enforcement
 
+![Forced Draw](suggestive-output/image16.png)
+
 ### Special Card Cases (Images 17-18)
 - **Multiple 7s**: Stacking penalties and effect resolution
 - **Ace Chains**: Consecutive skip effects
 - **Joker Plays**: Wild card suit selection overlay
 - **Effect Combinations**: Complex interaction scenarios
+
+![Special Cards 1](suggestive-output/image17.png)
+![Special Cards 2](suggestive-output/image18.png)
 
 ## 🚀 Getting Started
 
