@@ -65,6 +65,5 @@ ipch/
 *.VC.opendb
 
 # Project specific additions (Macao WPF)
-suggestive-output/
 *.log
 *.logs
