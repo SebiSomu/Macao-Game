@@ -4,7 +4,19 @@ A modern, SOLID-principled implementation of the classic Macao card game with a 
 
 ## 🎮 Game Overview
 
-Macao is a strategic card game where players take turns playing cards that match the top card's value or suit. The game features special cards with unique effects:
+Macao is a strategic card game where players take turns playing cards that match the top card's value or suit. 
+
+## 🎯 Game Rules
+
+### Basic Gameplay
+1. Each player starts with 5 cards
+2. Players take turns playing cards that match:
+   - Same **value** (number or face card)
+   - Same **suit** (♠♥♦♣)
+3. If unable to play, draw from deck (can draw at any time if you want to play a different strategy with your current hand later into the game)
+4. First player to empty their hand wins
+
+The game features special cards with unique effects:
 
 - **7 Cards**: Wild cards that can be played anytime and allow suit selection
 - **Aces**: Skip the next player's turn
@@ -27,6 +39,20 @@ Macao is a strategic card game where players take turns playing cards that match
 - **`ICardEffect`**: Extensible effect system
 - **`IAIStrategy`**: Pluggable AI implementations
 - **`ICardValidator`**: Customizable validation rules
+
+#### Liskov Substitution Principle (LSP)
+- **`Card`** can be substituted with any `ICard` implementation
+- **`MacaoAIStrategy`** can be replaced with any `IAIStrategy` without breaking functionality
+- **Inheritance hierarchy** maintains behavioral contracts
+- **Effects system** allows any `ICardEffect` to work with base game logic
+
+#### Interface Segregation Principle (ISP)
+- **Focused interfaces**: Each interface has a single, cohesive responsibility
+- **`ICardValidator`**: Only validation concerns
+- **`IAIStrategy`**: Only AI decision-making logic
+- **`ICardEffect`**: Only effect application
+- **No fat interfaces**: Clients depend only on methods they actually use
+- **Optional dependencies**: Game works without needing all interface implementations
 
 #### Dependency Inversion Principle (DIP)
 - **`Game`** depends on abstractions (`ICard`, `IPlayer`, `IDeck`)
@@ -88,55 +114,48 @@ Macao-Game-V2/
 - **Smart Suit Selection**: Chooses most frequent suit in hand
 - **Effect Awareness**: Considers pending penalties and effects
 
-## 🖼️ Screenshots Guide
+## 🎮 Game Showcase
 
-### Game Flow (Images 7-14, excluding 8)
-1. **Initial Setup**: Player and AI hands dealt, top card revealed
-2. **Player Turn**: Valid cards highlighted, invalid cards disabled
-3. **Card Play**: Smooth animations and state updates
-4. **Special Effects**: 7 cards trigger suit selection, Aces skip turns
-5. **AI Turn**: Intelligent card selection and automatic play
-6. **Win Conditions**: Empty hand triggers game over screen
+### Complete Game Simulation (Images 1, 3-16)
+A full gameplay demonstration showcasing all game mechanics and the improved card design:
 
-![Game Flow 1](suggestive-output/image7.png)
-![Game Flow 2](suggestive-output/image9.png)
-![Game Flow 3](suggestive-output/image10.png)
-![Game Flow 4](suggestive-output/image11.png)
-![Game Flow 5](suggestive-output/image12.png)
-![Game Flow 6](suggestive-output/image13.png)
-![Game Flow 7](suggestive-output/image14.png)
+![Game Start](game-output/image1.png)
+![Penalty Effect](game-output/image3.png)
+![AI Inflation](game-output/image4.png)
+![Draw Option](game-output/image5.png)
+![Card Draw](game-output/image6.png)
+![No Valid Cards](game-output/image7.png)
+![7 Card Play](game-output/image8.png)
+![7 Card Effect](game-output/image9.png)
+![7 Card Suit Change](game-output/image10.png)
+![Game Progress](game-output/image11.png)
+![Strategy Moment](game-output/image12.png)
+![7 Card Power](game-output/image13.png)
+![Winning Move](game-output/image14.png)
+![Victory](game-output/image15.png)
+![Final Screen](game-output/image16.png)
 
-### Dark Mode (Image 8)
-- **Toggle Button**: Sun/moon icon in top-left corner
-- **Theme Transition**: Complete UI color scheme change
-- **Card Appearance**: Black backgrounds with contrasting text
-- **Background Gradient**: Dark navy theme
+**Key Features Demonstrated:**
+- **Image 5**: Penalty inflation towards opponent + holding two 2s in hand - simulating the choice to end turn instead of playing both 2s
+- **Image 6**: AI inflates 2 cards (card count increases from 5 to 7)
+- **Image 7**: 7 card allows draw or suit choice
+- **Image 8**: Receiving cards after draw
+- **Image 10**: No valid cards available - forced to draw
+- **Images 13-15**: 7 card simulation - can play over any card with penalty + suit change
+- **Image 16**: Victory condition
+- **Image 17**: Multi-game statistics persistence across application runs
+- **Image 18 (Bonus)**: Joker - can be played over any card
 
-![Dark Mode](suggestive-output/image8.png)
+### Dark Mode (Image 2)
+Toggle between light and dark themes with professional card rendering:
 
-### Multi-Game Stats (Image 15)
-- **Win Tracking**: Human vs AI victories displayed
-- **Persistent Stats**: Counts survive across multiple games
-- **Top-Right Display**: Clean, unobtrusive positioning
+![Dark Mode](game-output/image2.png)
 
-![Multi-Game Stats](suggestive-output/image15.png)
-
-### Forced Draw Scenario (Image 16)
-- **No Valid Cards**: All player cards disabled
-- **Draw Pile Button**: Changes from "DRAW" to "END TURN"
-- **Visual Feedback**: Red penalty text shows required cards
-- **State Management**: Proper turn flow enforcement
-
-![Forced Draw](suggestive-output/image16.png)
-
-### Special Card Cases (Images 17-18)
-- **Multiple 7s**: Stacking penalties and effect resolution
-- **Ace Chains**: Consecutive skip effects
-- **Joker Plays**: Wild card suit selection overlay
-- **Effect Combinations**: Complex interaction scenarios
-
-![Special Cards 1](suggestive-output/image17.png)
-![Special Cards 2](suggestive-output/image18.png)
+**Design Improvements:**
+- ✅ **Perfect Ace centering** - Large suit symbols precisely centered
+- ✅ **Uniform corner indices** - All number cards (6, 9, 10) have symmetrical alignment
+- ✅ **Face card precision** - J, Q, K letters perfectly centered
+- ✅ **Professional typography** - Consistent spacing and visual hierarchy
 
 ## 🚀 Getting Started
 
@@ -157,27 +176,6 @@ Macao-Game-V2/
 - **Dark Mode Toggle**: Switch between light/dark themes
 - **Suit Selection**: Choose suit after playing a 7
 - **Restart**: Start a new game after game over
-
-## 🎯 Game Rules
-
-### Basic Gameplay
-1. Each player starts with 7 cards
-2. Players take turns playing cards that match:
-   - Same **value** (number or face card)
-   - Same **suit** (♠♥♦♣)
-3. If unable to play, draw from deck
-4. First player to empty their hand wins
-
-### Special Cards
-- **7**: Next player draws 2 cards OR you choose new suit
-- **Ace**: Skip next player's turn
-- **Joker**: Wild card - play anytime, choose any suit
-- **Other Numbers**: Standard matching rules
-
-### Winning
-- Play all cards from your hand
-- AI tracks wins across multiple games
-- Game over screen shows winner and statistics
 
 ## 🔧 Technical Highlights
 

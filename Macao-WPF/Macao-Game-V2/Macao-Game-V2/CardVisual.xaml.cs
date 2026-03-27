@@ -261,13 +261,18 @@ namespace Macao_Game_V2
                 HorizontalAlignment = HorizontalAlignment.Center
             });
 
+            // Measure the panel to get actual size
+            panel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            double panelWidth = panel.DesiredSize.Width;
+            double panelHeight = panel.DesiredSize.Height;
+
             if (flipped)
             {
                 panel.RenderTransformOrigin = new Point(0.5, 0.5);
                 panel.RenderTransform = new RotateTransform(180);
-                // Measure approximate size to offset correctly
-                Canvas.SetLeft(panel, x - 13);
-                Canvas.SetTop(panel, y - 22);
+                // Position with proper margin from edge using measured size
+                Canvas.SetLeft(panel, x - panelWidth);
+                Canvas.SetTop(panel, y - panelHeight);
             }
             else
             {
@@ -292,11 +297,14 @@ namespace Macao_Game_V2
                 FontFamily = SerifFont
             };
 
-            // Measure roughly: suit glyphs are ~0.7 * fontSize wide
-            double approxW = fontSize * 0.72;
-            double approxH = fontSize * 0.9;
-            Canvas.SetLeft(tb, (CardW - approxW) / 2 - 2);
-            Canvas.SetTop(tb, (CardH - approxH) / 2 - 4);
+            // Measure actual text size for perfect centering
+            tb.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            double textWidth = tb.DesiredSize.Width;
+            double textHeight = tb.DesiredSize.Height;
+            
+            // Center the symbol precisely
+            Canvas.SetLeft(tb, (CardW - textWidth) / 2);
+            Canvas.SetTop(tb, (CardH - textHeight) / 2);
             root.Children.Add(tb);
         }
 
@@ -408,8 +416,11 @@ namespace Macao_Game_V2
                 FontFamily = SerifFont,
                 Foreground = color
             };
-            // Letters are ~18px wide at 32px Georgia Bold
-            Canvas.SetLeft(letter, cx - 10);
+            // Measure actual letter width for perfect centering
+            letter.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            double letterWidth = letter.DesiredSize.Width;
+            double letterHeight = letter.DesiredSize.Height;
+            Canvas.SetLeft(letter, cx - letterWidth / 2);
             Canvas.SetTop(letter, fy + 16);
             root.Children.Add(letter);
 
