@@ -119,21 +119,21 @@ Macao-Game-V2/
 ### Complete Game Simulation (Images 1, 3-16)
 A full gameplay demonstration showcasing all game mechanics and the improved card design:
 
-![Game Start](game-output/image1.png)
-![Penalty Effect](game-output/image3.png)
-![AI Inflation](game-output/image4.png)
-![Draw Option](game-output/image5.png)
-![Card Draw](game-output/image6.png)
-![No Valid Cards](game-output/image7.png)
-![7 Card Play](game-output/image8.png)
-![7 Card Effect](game-output/image9.png)
-![7 Card Suit Change](game-output/image10.png)
-![Game Progress](game-output/image11.png)
-![Strategy Moment](game-output/image12.png)
-![7 Card Power](game-output/image13.png)
-![Winning Move](game-output/image14.png)
-![Victory](game-output/image15.png)
-![Final Screen](game-output/image16.png)
+![Game Start](suggestive-output/game-output1.png)
+![Normal Flow](suggestive-output/game-output3.png)
+![Normal Flow](suggestive-output/game-output4.png)
+![Penalty Effect to AI player](suggestive-output/game-output5.png)
+![AI Inflation](suggestive-output/game-output6.png)
+![Draw Option](suggestive-output/game-output7.png)
+![Draw Effect](suggestive-output/game-output8.png)
+![Normal Flow](suggestive-output/game-output9.png)
+![No Card Valid](suggestive-output/game-output10.png)
+![Normal Flow](suggestive-output/game-output11.png)
+![Normal Flow](suggestive-output/game-output12.png)
+![7 Card Power](suggestive-output/game-output13.png)
+![7 Card Power](suggestive-output/game-output14.png)
+![7 Card Power](suggestive-output/game-output15.png)
+![Victory](suggestive-output/game-output16.png)
 
 **Key Features Demonstrated:**
 - **Image 5**: Penalty inflation towards opponent + holding two 2s in hand - simulating the choice to end turn instead of playing both 2s
@@ -146,10 +146,24 @@ A full gameplay demonstration showcasing all game mechanics and the improved car
 - **Image 17**: Multi-game statistics persistence across application runs
 - **Image 18 (Bonus)**: Joker - can be played over any card
 
+### Multi-Game Stats (Image 17)
+- **Win Tracking**: Human vs AI victories displayed
+- **Persistent Stats**: Counts survive across multiple games
+- **Top-Right Display**: Clean, unobtrusive positioning
+
+![Multi-Game Stats](suggestive-output/game-output17.png)
+
+### Bonus: Joker (Image 18)
+- **Wild Card**: Can be played over any card
+- **Suit Selection**: Choose any suit after playing
+- **Strategic Advantage**: Powerful game-changing effect
+
+![Joker Bonus](suggestive-output/game-output18.png)
+
 ### Dark Mode (Image 2)
 Toggle between light and dark themes with professional card rendering:
 
-![Dark Mode](game-output/image2.png)
+![Dark Mode](suggestive-output/game-output2.png)
 
 **Design Improvements:**
 - ✅ **Perfect Ace centering** - Large suit symbols precisely centered
