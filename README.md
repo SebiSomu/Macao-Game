@@ -198,14 +198,6 @@ Macao-Game-V2/
 - **Responsive Design**: Adaptive layouts for different screen sizes
 - **Accessibility**: Semantic markup and keyboard navigation
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Implement your changes following SOLID principles
-4. Add tests for new functionality
-5. Submit a pull request
-
 ## 📝 Future Enhancements
 
 - **Multiplayer Support**: Network play for multiple humans
