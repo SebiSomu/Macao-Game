@@ -14,12 +14,11 @@ namespace Macao_Game_V2.Domain
             {
                 if (currentTurnCardValue == "A")
                 {
-                    if (card.Value == "A" || card.Suit == topCard?.Suit)
+                    if (card.Value == "A" || card.Suit == topCard?.Suit || card.IsJoker || card.Value == "7")
                         return true;
                 }
 
-                if (card.Value != currentTurnCardValue)
-                    return false;
+                return card.Value == currentTurnCardValue;
             }
 
             // Special cards that can always be played

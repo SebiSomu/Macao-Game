@@ -8,14 +8,8 @@ using Macao_Game_V2.Domain;
 
 namespace Macao_Game_V2
 {
-    /// <summary>
-    /// UserControl that renders a realistic Bicycle-style playing card using WPF shapes.
-    /// Fully programmatic — no image assets required.
-    /// </summary>
     public partial class CardVisual : UserControl
     {
-        // ── Dependency Properties ────────────────────────────────────────────────
-
         public static readonly DependencyProperty CardProperty =
             DependencyProperty.Register("Card", typeof(Card), typeof(CardVisual),
                 new PropertyMetadata(null, OnCardChanged));
@@ -347,9 +341,6 @@ namespace Macao_Game_V2
             }
         }
 
-        // Pip grid positions — (centerX, centerY, inverted)
-        // Coordinates are visual centers; RenderPips offsets by half-glyph-size.
-        // Card area available between corner indices: ~Y 26..94
         private (double x, double y, bool inv)[] GetPipPositions(int value)
         {
             const double L = 20;   // left column X center
@@ -616,10 +607,11 @@ namespace Macao_Game_V2
             => value == "J" || value == "Q" || value == "K";
     }
 
-    // ── Extension helper ─────────────────────────────────────────────────────────
-
     internal static class UiExtensions
     {
-        public static T Also<T>(this T obj, Action<T> action) { action(obj); return obj; }
+        public static T Also<T>(this T obj, Action<T> action) { 
+            action(obj); 
+            return obj; 
+        }
     }
 }

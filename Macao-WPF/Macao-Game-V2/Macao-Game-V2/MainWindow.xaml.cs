@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using Macao_Game_V2.Abstractions;
 using Macao_Game_V2.Domain;
 
@@ -90,9 +91,49 @@ namespace Macao_Game_V2
 
             if (_game.TopCard != null)
             {
+                var oldCard = TopCardVisual.Card;
                 TopCardVisual.Card = _game.TopCard;
                 TopCardVisual.IsFaceDown = false;
                 TopCardVisual.IsDarkMode = _isDarkMode;
+
+                if (oldCard != _game.TopCard)
+                {
+                    // Card Throw Animation: Translate & Rotate
+                    var translate = new TranslateTransform(-120, 40); // Throw from bottom-left
+                    var rotate = new RotateTransform(-20);
+                    var transformGroup = new TransformGroup();
+                    transformGroup.Children.Add(rotate);
+                    transformGroup.Children.Add(translate);
+                    TopCardVisual.RenderTransform = transformGroup;
+
+                    var throwX = new DoubleAnimation
+                    {
+                        From = -120,
+                        To = 0,
+                        Duration = TimeSpan.FromMilliseconds(400),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+
+                    var throwY = new DoubleAnimation
+                    {
+                        From = 40,
+                        To = 0,
+                        Duration = TimeSpan.FromMilliseconds(400),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+
+                    var spin = new DoubleAnimation
+                    {
+                        From = -20,
+                        To = 0,
+                        Duration = TimeSpan.FromMilliseconds(400),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+
+                    translate.BeginAnimation(TranslateTransform.XProperty, throwX);
+                    translate.BeginAnimation(TranslateTransform.YProperty, throwY);
+                    rotate.BeginAnimation(RotateTransform.AngleProperty, spin);
+                }
             }
 
             // Draw Pile / End Turn button text
@@ -103,6 +144,7 @@ namespace Macao_Game_V2
 
             // Render Player Hand with CardVisual
             PlayerHandPanel.Children.Clear();
+            int index = 0;
             foreach (var card in _game.HumanPlayer.Hand)
             {
                 Button cardBtn = new Button();
@@ -124,6 +166,20 @@ namespace Macao_Game_V2
 
                 cardBtn.Click += CardBtn_Click;
                 PlayerHandPanel.Children.Add(cardBtn);
+
+                var translateTransform = new TranslateTransform(0, 150);
+                cardBtn.RenderTransform = translateTransform;
+
+                var slideAnimation = new DoubleAnimation
+                {
+                    From = 150,
+                    To = 0,
+                    Duration = TimeSpan.FromMilliseconds(350),
+                    BeginTime = TimeSpan.FromMilliseconds(index * 35),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+                translateTransform.BeginAnimation(TranslateTransform.YProperty, slideAnimation);
+                index++;
             }
         }
 
