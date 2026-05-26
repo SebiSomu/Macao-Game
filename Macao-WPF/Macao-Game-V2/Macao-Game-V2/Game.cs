@@ -23,6 +23,8 @@ namespace Macao_Game_V2
         private readonly IAIStrategy _aiStrategy;
         private readonly CardEffectResolver _effectResolver;
 
+        public IAIStrategy AIStrategy => _aiStrategy;
+
         public event Action<string> OnGameMessage;
         public event Action OnGameStateChanged;
         public event Action<Card> OnSuitSelectionRequired; 
@@ -37,7 +39,6 @@ namespace Macao_Game_V2
         public bool IsGameOver => _isGameOver;
         public string CurrentTurnCardValue { get; private set; }
 
-        // IGameState implementation
         ICard IGameState.TopCard => _discardPile.Count > 0 ? _discardPile.Peek() : null;
         int IGameState.CardsToDraw { get => _cardsToDraw; set => _cardsToDraw = value; }
         bool IGameState.SkipNextTurn { get => _skipNextTurn; set => _skipNextTurn = value; }
@@ -62,6 +63,7 @@ namespace Macao_Game_V2
 
         public void StartGame()
         {
+            _aiStrategy.Memory.Reset();
             _deck = new Deck();
             _humanPlayer.Hand.Clear();
             _computerPlayer.Hand.Clear();
@@ -134,7 +136,15 @@ namespace Macao_Game_V2
 
             if (CurrentTurnCardValue != null)
             {
-                if (card.Value != CurrentTurnCardValue)
+                if (CurrentTurnCardValue == "A")
+                {
+                    if (card.Value != "A" && card.Suit != TopCard?.Suit)
+                    {
+                        NotifyMessage($"You must play another Ace or a card of suit {TopCard?.Suit} or click END TURN to finish.");
+                        return false;
+                    }
+                }
+                else if (card.Value != CurrentTurnCardValue)
                 {
                     NotifyMessage($"You must play a {CurrentTurnCardValue} or click END TURN to finish.");
                     return false;
@@ -172,6 +182,7 @@ namespace Macao_Game_V2
         private void FinishHumanCardPlay(Card card)
         {
             _discardPile.Push(card);
+            _aiStrategy.Memory.AddCard(card);
             _effectResolver.ApplyEffects(card, this);
 
             if (_humanPlayer.HasWon())
@@ -204,6 +215,11 @@ namespace Macao_Game_V2
             CurrentTurnCardValue = null;
             _isHumanTurn = false;
             NotifyStateChanged();
+
+            if (_skipNextTurn && TopCard?.Value != "A")
+            {
+                _skipNextTurn = false;
+            }
 
             if (_skipNextTurn)
             {
@@ -261,6 +277,7 @@ namespace Macao_Game_V2
                     }
 
                     _discardPile.Push(cardToPlay);
+                    _aiStrategy.Memory.AddCard(cardToPlay);
                     _effectResolver.ApplyEffects(cardToPlay, this);
 
                     if (_computerPlayer.HasWon())
@@ -305,6 +322,11 @@ namespace Macao_Game_V2
             _isHumanTurn = true;
             NotifyStateChanged();
 
+            if (_skipNextTurn && TopCard?.Value != "A")
+            {
+                _skipNextTurn = false;
+            }
+
             if (_skipNextTurn)
             {
                 _skipNextTurn = false;
@@ -328,6 +350,7 @@ namespace Macao_Game_V2
                 _discardPile.Clear();
                 _discardPile.Push(top);
                 _deck.Reshuffle(toReshuffle);
+                _aiStrategy.Memory.Reset();
             }
             return _deck.DrawCard();
         }
@@ -335,6 +358,10 @@ namespace Macao_Game_V2
         // IGameState notification methods
         public void NotifyStateChanged() => OnGameStateChanged?.Invoke();
         public void NotifyMessage(string message) => OnGameMessage?.Invoke(message);
-        public void NotifyGameOver(string message) => OnGameOver?.Invoke(message);
+        public void NotifyGameOver(string message)
+        {
+            _aiStrategy.Memory.Reset();
+            OnGameOver?.Invoke(message);
+        }
     }
 }

@@ -10,9 +10,14 @@ namespace Macao_Game_V2.Domain
             if (cardsToDraw > 0)
                 return (card.Value == "2" || card.Value == "3" || card.IsJoker);
 
-            // If a specific card value is required (e.g., after playing a 7), only allow that value
             if (!string.IsNullOrEmpty(currentTurnCardValue))
             {
+                if (currentTurnCardValue == "A")
+                {
+                    if (card.Value == "A" || card.Suit == topCard?.Suit)
+                        return true;
+                }
+
                 if (card.Value != currentTurnCardValue)
                     return false;
             }

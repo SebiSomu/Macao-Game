@@ -90,9 +90,16 @@
         <Grid Grid.Row="0">
             <StackPanel HorizontalAlignment="Center" Margin="10">
                 <TextBlock x:Name="AiStatusText" Text="AI Cards: 5" FontSize="20" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                <ScrollViewer x:Name="AiHandDebugArea" Visibility="Collapsed" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" MaxHeight="60" Margin="0,5,0,0">
+                
+                <!-- <TextBlock Text="AI Hand:" FontSize="11" Foreground="#FFAAAAAA" HorizontalAlignment="Center" Margin="0,5,0,2"/>
+                <ScrollViewer x:Name="AiHandDebugArea" Visibility="Collapsed" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" MaxHeight="25" Margin="0,0,0,5">
                     <WrapPanel x:Name="AiHandPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
                 </ScrollViewer>
+                <TextBlock x:Name="MemoryCountText" Text="Memory Buffer: 0/54" FontSize="11" Foreground="#FFAAAAAA" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                <ScrollViewer x:Name="MemoryDebugArea" Visibility="Collapsed" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" MaxHeight="25" Margin="0,0,0,0">
+                    <WrapPanel x:Name="MemoryBufferPanel" Orientation="Horizontal" HorizontalAlignment="Center"/>
+                </ScrollViewer> -->
+               
                 <TextBlock x:Name="GameMessageText" Text="Welcome to Macao!" FontSize="18" Foreground="#FFFFD700" Margin="0,5,0,0" TextWrapping="Wrap" TextAlignment="Center"/>
                 <TextBlock x:Name="TurnText" Text="Your Turn" FontSize="16" Foreground="LightGreen" HorizontalAlignment="Center" Margin="0,5,0,0"/>
             </StackPanel>

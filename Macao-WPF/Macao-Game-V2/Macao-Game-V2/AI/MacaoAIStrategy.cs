@@ -7,6 +7,10 @@ namespace Macao_Game_V2.AI
 {
     public class MacaoAIStrategy : IAIStrategy
     {
+        private readonly CardsMemory _memory = new CardsMemory();
+        public ICardsMemory Memory => _memory;
+        private static readonly char[] Suits = { '\u2660', '\u2665', '\u2666', '\u2663' };
+
         public List<ICard> SelectCardsToPlay(IGameState gameState, List<ICard> hand)
         {
             var validCardsByValue = new Dictionary<string, List<ICard>>();
@@ -25,7 +29,7 @@ namespace Macao_Game_V2.AI
             }
             else
             {
-                // Normal play - use validator to check valid cards
+                // Normal play 
                 var validator = new Domain.MacaoCardValidator();
                 foreach (var card in hand)
                 {
@@ -56,7 +60,6 @@ namespace Macao_Game_V2.AI
                 }
             }
 
-            // No valid cards
             if (validCardsByValue.Count == 0)
             {
                 if (gameState.CardsToDraw == 0)
@@ -90,8 +93,10 @@ namespace Macao_Game_V2.AI
 
                 if (isInflate && cards.Count > 1)
                 {
-                    Random random = new Random();
-                    if (random.Next(100) >= 10) // 90% chance to only play one and save the rest
+                    double probLacks = EstimateOpponentLacksPenaltyCards(gameState, hand);
+                    double roll = new Random().NextDouble();
+
+                    if (roll > probLacks)
                     {
                         int score = 1;
                         if (score > bestScore)
@@ -120,36 +125,69 @@ namespace Macao_Game_V2.AI
             // Fallback to Joker if nothing selected
             if (bestSelection.Count == 0)
             {
-                foreach (var c in hand) if (c.IsJoker) return new List<ICard> { c };
+                foreach (var c in hand)
+                    if (c.IsJoker)
+                        return new List<ICard> { c };
             }
 
             return bestSelection;
         }
 
+        private double EstimateOpponentLacksPenaltyCards(IGameState gameState, List<ICard> hand)
+        {
+            int opponentCardCount = gameState.HumanPlayer.Hand.Count;
+            if (opponentCardCount <= 0) return 1.0;
+
+            const int totalPenaltiesInDeck = 10; 
+            
+            int seenPenalties = _memory.PlayedCards.Count(c => c.Value == "2" || c.Value == "3" || c.IsJoker);
+            int aiPenalties = hand.Count(c => c.Value == "2" || c.Value == "3" || c.IsJoker);
+
+            int totalKnown = _memory.PlayedCards.Count + hand.Count;
+            int remainingPenalties = Math.Max(0, totalPenaltiesInDeck - seenPenalties - aiPenalties);
+            int totalUnknown = Math.Max(1, 54 - totalKnown);
+
+            double fractionPenalties = (double)remainingPenalties / totalUnknown;
+            
+            double probLacks = Math.Pow(1.0 - fractionPenalties, opponentCardCount);
+            return Math.Min(1.0, Math.Max(0.0, probLacks));
+        }
+
         private List<ICard> ReorderSelection(List<ICard> selection, IGameState gameState, List<ICard> hand)
         {
-            List<ICard> reordered = new List<ICard>();
-            ICard firstCard = selection[0];
+            if (selection == null || selection.Count <= 1)
+                return selection;
+
+            int opponentCardCount = gameState.HumanPlayer.Hand.Count;
+
+            double GetCardScoreForLast(ICard card)
+            {
+                return _memory.ProbabilityOpponentLacksSuit(card.Suit, hand, opponentCardCount);
+            }
 
             var validator = new Domain.MacaoCardValidator();
+            var validStarters = selection
+                .Where(card => validator.IsCardValid(card, gameState.TopCard, gameState.CardsToDraw, null))
+                .ToList();
 
-            // Find first valid card
-            foreach (var card in selection)
+            ICard firstCard;
+            if (validStarters.Count > 0)
             {
-                if (validator.IsCardValid(card, gameState.TopCard, gameState.CardsToDraw, null))
-                {
-                    firstCard = card;
-                    break;
-                }
+                firstCard = validStarters.OrderBy(GetCardScoreForLast).First();
+            }
+            else
+            {
+                firstCard = selection[0];
             }
 
-            reordered.Add(firstCard);
-            foreach (var card in selection)
-            {
-                if (card != firstCard) reordered.Add(card);
-            }
+            List<ICard> reordered = new List<ICard> { firstCard };
 
-            // Special handling for 7s
+            var remaining = selection.Where(card => card != firstCard)
+                                     .OrderBy(GetCardScoreForLast)
+                                     .ToList();
+
+            reordered.AddRange(remaining);
+
             if (firstCard.Value == "7")
             {
                 char bestSuit = ChooseSuit(gameState, hand, false);
@@ -170,35 +208,27 @@ namespace Macao_Game_V2.AI
 
         public char ChooseSuit(IGameState gameState, List<ICard> hand, bool excludeSpecials)
         {
-            var suitFrequency = new Dictionary<char, int>();
-
-            foreach (var card in hand)
-            {
-                bool isExcluded = card.IsJoker || (excludeSpecials && card.Value == "7");
-                if (!isExcluded)
-                {
-                    if (!suitFrequency.ContainsKey(card.Suit))
-                        suitFrequency[card.Suit] = 0;
-                    suitFrequency[card.Suit]++;
-                }
-            }
+            int opponentCardCount = gameState.HumanPlayer.Hand.Count;
+            List<ICard> handList = hand;
 
             char bestSuit = ' ';
-            int maxCount = -1;
-            foreach (var kvp in suitFrequency)
+            double bestScore = -1;
+
+            foreach (char suit in Suits)
             {
-                if (kvp.Value > maxCount)
+                int greedyCount = hand.Count(c => !c.IsJoker && !(excludeSpecials && c.Value == "7") && c.Suit == suit);
+                double memoryBonus = _memory.ProbabilityOpponentLacksSuit(suit, handList, opponentCardCount);
+                double score = greedyCount * 2.0 + memoryBonus * 1.0;
+
+                if (score > bestScore)
                 {
-                    maxCount = kvp.Value;
-                    bestSuit = kvp.Key;
+                    bestScore = score;
+                    bestSuit = suit;
                 }
             }
 
-            if (maxCount <= 0 || (bestSuit != '♠' && bestSuit != '♥' && bestSuit != '♦' && bestSuit != '♣'))
-            {
-                char[] suits = { '♠', '♥', '♦', '♣' };
-                bestSuit = suits[new Random().Next(4)];
-            }
+            if (bestSuit == ' ')
+                bestSuit = Suits[new Random().Next(Suits.Length)];
 
             return bestSuit;
         }

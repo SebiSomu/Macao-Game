@@ -10,7 +10,6 @@ namespace Macao_Game_V2.Domain
         private char cardSuit;
         private bool cardIsJoker;
 
-        // Mapping from macao-v1 format letters to Unicode suit symbols
         private static readonly Dictionary<char, char> SuitLetterToSymbol = new Dictionary<char, char>
         {
             { 'S', '♠' },  // Spade

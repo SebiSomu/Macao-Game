@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Macao_Game_V2.Abstractions;
 using Macao_Game_V2.Domain;
 
 namespace Macao_Game_V2
@@ -56,6 +57,22 @@ namespace Macao_Game_V2
         {
             // Update AI Stats
             AiStatusText.Text = $"AI Cards: {_game.ComputerPlayer.Hand.Count}";
+
+            // // Debug: AI Hand
+            // AiHandPanel.Children.Clear();
+            // foreach (var card in _game.ComputerPlayer.Hand)
+            // {
+            //     AiHandPanel.Children.Add(MakeDebugCardLabel(card, 12));
+            // }
+
+            // // Debug: Memory Buffer
+            // MemoryBufferPanel.Children.Clear();
+            // var memoryCards = _game.AIStrategy.Memory.PlayedCards;
+            // MemoryCountText.Text = $"Memory Buffer: {memoryCards.Count} cards";
+            // foreach (var card in memoryCards)
+            // {
+            //     MemoryBufferPanel.Children.Add(MakeDebugCardLabel(card, 11));
+            // }
             
             // Turn text
             TurnText.Text = _game.IsHumanTurn ? "Your Turn" : "AI is playing...";
@@ -187,10 +204,7 @@ namespace Macao_Game_V2
                 }
             }
 
-            // Update app background
             UpdateAppBackground();
-
-            // Update toggle button icon
             UpdateDarkModeToggle();
         }
 
@@ -243,6 +257,26 @@ namespace Macao_Game_V2
                     icon.Text = _isDarkMode ? "🌙" : "☀️";
                 }
             }
+        }
+
+        private static TextBlock MakeDebugCardLabel(ICard card, double fontSize)
+        {
+            Brush foreground;
+            if (card.IsJoker)
+                foreground = Brushes.MediumPurple;
+            else if (card.Suit == '\u2665' || card.Suit == '\u2666')
+                foreground = Brushes.OrangeRed;
+            else
+                foreground = Brushes.White;
+
+            return new TextBlock
+            {
+                Text = card.ToString(),
+                Margin = new Thickness(3, 0, 3, 0),
+                FontSize = fontSize,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = foreground
+            };
         }
     }
 }
